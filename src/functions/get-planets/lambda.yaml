@@ -1,0 +1,18 @@
+get-planets:
+  handler: src/functions/get-planets/handler.main
+  runtime: nodejs14.x
+  memorySize: 512
+  logRetentionInDays: 30
+  architecture: arm64
+  timeout: 2
+  events:
+    - httpApi:
+        method: get
+        path: /planet
+  vpc:
+    securityGroupIds:
+      - Ref: ServerlessSecurityGroup # lambda-to-rds sg
+    subnetIds:
+      - Ref: ServerlessSubnetA # us-east-2b
+      - Ref: ServerlessSubnetB # us-east-2c
+      - Ref: ServerlessSubnetC # us-east-2a

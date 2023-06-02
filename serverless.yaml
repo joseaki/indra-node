@@ -1,0 +1,54 @@
+---
+service: serverless-swapi
+frameworkVersion: "3"
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+  - serverless-dotenv-plugin
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-2
+  httpApi:
+    name: ${sls:stage}-${self:service}
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
+    MYSQL_HOST: ${self:custom.MYSQL.HOST}
+    MYSQL_PORT: ${self:custom.MYSQL.PORT}
+    DB_NAME: ${self:custom.DB_NAME}
+    USERNAME: ${self:custom.USERNAME}
+    PASSWORD: ${self:custom.PASSWORD}
+    NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000"
+    SWAPI: "https://swapi.py4e.com/api"
+custom:
+  DB_NAME: swapi
+  USERNAME: swapi
+  PASSWORD: admin4550
+  MYSQL:
+    HOST:
+      Fn::GetAtt: [MySqlRDSInstance, Endpoint.Address]
+    PORT:
+      Fn::GetAtt: [MySqlRDSInstance, Endpoint.Port]
+functions:
+  - ${file(src/functions/create-planet/lambda.yaml)}
+  - ${file(src/functions/update-planet/lambda.yaml)}
+  - ${file(src/functions/get-planet/lambda.yaml)}
+  - ${file(src/functions/get-planets/lambda.yaml)}
+package:
+  individually: true
+resources:
+  Resources:
+    ServerlessInternetGateway: ${file(./resources/InternetGateway.yaml)}
+    ServerlessVPC: ${file(./resources/VPC.yaml)}
+    ServerlessVPCGA: ${file(./resources/VPCGA.yaml)}
+    ServerlessSubnetA: ${file(./resources/SubnetA.yaml)}
+    ServerlessSubnetB: ${file(./resources/SubnetB.yaml)}
+    ServerlessSubnetC: ${file(./resources/SubnetC.yaml)}
+    ServerlessSubnetGroup: ${file(./resources/SubnetGroup.yaml)}
+    ServerlessSecurityGroup: ${file(./resources/SG.yaml)}
+    RouteTablePublic: ${file(./resources/RTPublic.yaml)}
+    RP: ${file(./resources/RP.yaml)}
+    SubnetRouteTableAssociationA: ${file(./resources/SubnetRouteTableAssociationA.yaml)}
+    SubnetRouteTableAssociationB: ${file(./resources/SubnetRouteTableAssociationB.yaml)}
+    SubnetRouteTableAssociationC: ${file(./resources/SubnetRouteTableAssociationC.yaml)}
+    MySqlRDSInstance: ${file(./resources/RDSInstance.yaml)}

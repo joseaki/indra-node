@@ -1,0 +1,7 @@
+DependsOn: ServerlessVPC
+Type: AWS::EC2::VPCGatewayAttachment
+Properties:
+  VpcId:
+    Ref: ServerlessVPC
+  InternetGatewayId:
+    Ref: ServerlessInternetGateway
